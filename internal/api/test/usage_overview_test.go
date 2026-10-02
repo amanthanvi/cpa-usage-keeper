@@ -51,6 +51,10 @@ func (s *overviewAPIKeyStub) ListCPAAPIKeys(context.Context) ([]entities.CPAAPIK
 	return []entities.CPAAPIKey{s.row}, nil
 }
 
+func (s *overviewAPIKeyStub) ListCPAAPIKeysForHistory(ctx context.Context) ([]entities.CPAAPIKey, error) {
+	return s.ListCPAAPIKeys(ctx)
+}
+
 func (s *overviewAPIKeyStub) FindActiveCPAAPIKeyByID(context.Context, int64) (entities.CPAAPIKey, error) {
 	return s.row, s.findErr
 }

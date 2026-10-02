@@ -16,6 +16,7 @@ var ErrInvalidID = errors.New("invalid id")
 
 type CPAAPIKeyProvider interface {
 	ListCPAAPIKeys(ctx context.Context) ([]entities.CPAAPIKey, error)
+	ListCPAAPIKeysForHistory(ctx context.Context) ([]entities.CPAAPIKey, error)
 	FindActiveCPAAPIKeyByValue(ctx context.Context, apiKey string) (entities.CPAAPIKey, error)
 	FindActiveCPAAPIKeyByID(ctx context.Context, id int64) (entities.CPAAPIKey, error)
 	UpdateCPAAPIKeyAlias(ctx context.Context, id int64, keyAlias string) (entities.CPAAPIKey, error)
@@ -31,6 +32,10 @@ func NewCPAAPIKeyService(db *gorm.DB) CPAAPIKeyProvider {
 
 func (s *cpaAPIKeyService) ListCPAAPIKeys(context.Context) ([]entities.CPAAPIKey, error) {
 	return repository.ListActiveCPAAPIKeys(s.db)
+}
+
+func (s *cpaAPIKeyService) ListCPAAPIKeysForHistory(context.Context) ([]entities.CPAAPIKey, error) {
+	return repository.ListCPAAPIKeysForHistory(s.db)
 }
 
 func (s *cpaAPIKeyService) FindActiveCPAAPIKeyByValue(_ context.Context, apiKey string) (entities.CPAAPIKey, error) {

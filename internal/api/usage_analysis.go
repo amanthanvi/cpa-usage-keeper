@@ -284,7 +284,7 @@ func loadCPAAPIKeyInfos(c *gin.Context, provider service.CPAAPIKeyProvider) (map
 	if provider == nil {
 		return map[string]analysisAPIKeyInfo{}, nil
 	}
-	rows, err := provider.ListCPAAPIKeys(c.Request.Context())
+	rows, err := provider.ListCPAAPIKeysForHistory(c.Request.Context())
 	if err != nil {
 		writeInternalError(c, "list api key options failed", err)
 		return nil, err

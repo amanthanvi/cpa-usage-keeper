@@ -24,6 +24,10 @@ func (s usageAnalysisAPIKeyStub) ListCPAAPIKeys(context.Context) ([]entities.CPA
 	return s.rows, nil
 }
 
+func (s usageAnalysisAPIKeyStub) ListCPAAPIKeysForHistory(context.Context) ([]entities.CPAAPIKey, error) {
+	return s.rows, nil
+}
+
 func TestUsageAnalysisReturnsAggregatedRows(t *testing.T) {
 	bucket := time.Date(2026, 4, 22, 10, 0, 0, 0, time.Local)
 	provider := &analysisSplitStub{analysis: &servicedto.AnalysisSnapshot{

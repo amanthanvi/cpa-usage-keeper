@@ -173,6 +173,10 @@ func (s *authCPAAPIKeyStub) ListCPAAPIKeys(context.Context) ([]entities.CPAAPIKe
 	return []entities.CPAAPIKey{s.row}, nil
 }
 
+func (s *authCPAAPIKeyStub) ListCPAAPIKeysForHistory(context.Context) ([]entities.CPAAPIKey, error) {
+	return []entities.CPAAPIKey{s.row}, nil
+}
+
 func (s *authCPAAPIKeyStub) FindActiveCPAAPIKeyByValue(context.Context, string) (entities.CPAAPIKey, error) {
 	return s.row, nil
 }
