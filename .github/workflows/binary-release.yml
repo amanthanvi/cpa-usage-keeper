@@ -252,6 +252,7 @@ jobs:
             dist/checksums.txt
 
   update-homebrew-tap:
+    if: github.repository == 'Willxup/cpa-usage-keeper'
     runs-on: ubuntu-24.04
     needs: publish-release
     steps:
