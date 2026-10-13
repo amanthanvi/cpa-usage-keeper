@@ -22,6 +22,10 @@ func (s *keyViewerRankingKeyStub) ListCPAAPIKeys(context.Context) ([]entities.CP
 	return []entities.CPAAPIKey{s.row}, nil
 }
 
+func (s *keyViewerRankingKeyStub) ListCPAAPIKeysForHistory(context.Context) ([]entities.CPAAPIKey, error) {
+	return []entities.CPAAPIKey{s.row}, nil
+}
+
 func (s *keyViewerRankingKeyStub) FindActiveCPAAPIKeyByValue(context.Context, string) (entities.CPAAPIKey, error) {
 	return s.row, nil
 }

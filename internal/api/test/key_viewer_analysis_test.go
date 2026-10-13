@@ -67,6 +67,10 @@ func (s *keyViewerAnalysisKeyStub) ListCPAAPIKeys(context.Context) ([]entities.C
 	return []entities.CPAAPIKey{s.row, {ID: 99, APIKey: "sk-other654321", KeyAlias: "Other Key"}}, nil
 }
 
+func (s *keyViewerAnalysisKeyStub) ListCPAAPIKeysForHistory(ctx context.Context) ([]entities.CPAAPIKey, error) {
+	return s.ListCPAAPIKeys(ctx)
+}
+
 func (s *keyViewerAnalysisKeyStub) FindActiveCPAAPIKeyByID(_ context.Context, id int64) (entities.CPAAPIKey, error) {
 	if id != s.row.ID {
 		return entities.CPAAPIKey{}, service.ErrInvalidID
