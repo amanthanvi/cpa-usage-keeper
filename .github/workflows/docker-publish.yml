@@ -11,6 +11,7 @@ permissions:
 
 jobs:
   docker:
+    if: github.repository == 'Willxup/cpa-usage-keeper'
     runs-on: ubuntu-latest
     steps:
       - name: Checkout repository
