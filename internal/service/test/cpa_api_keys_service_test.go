@@ -13,6 +13,15 @@ import (
 )
 
 func TestListCPAAPIKeysHonorsInFlightCancellation(t *testing.T) {
+	testCPAAPIKeyListCancellation(t, false)
+}
+
+func TestListCPAAPIKeysForHistoryHonorsInFlightCancellation(t *testing.T) {
+	testCPAAPIKeyListCancellation(t, true)
+}
+
+func testCPAAPIKeyListCancellation(t *testing.T, history bool) {
+	t.Helper()
 	db := openUsageServiceTestDatabase(t)
 	sqlDB, err := db.DB()
 	if err != nil {
@@ -27,7 +36,15 @@ func TestListCPAAPIKeysHonorsInFlightCancellation(t *testing.T) {
 	ctx, cancel := context.WithCancel(context.Background())
 	done := make(chan error, 1)
 	provider := keeperservice.NewCPAAPIKeyService(db)
-	go func() { _, err := provider.ListCPAAPIKeys(ctx); done <- err }()
+	go func() {
+		var err error
+		if history {
+			_, err = provider.ListCPAAPIKeysForHistory(ctx)
+		} else {
+			_, err = provider.ListCPAAPIKeys(ctx)
+		}
+		done <- err
+	}()
 	finished := false
 	defer func() {
 		cancel()

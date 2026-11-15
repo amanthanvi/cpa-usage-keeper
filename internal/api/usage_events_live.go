@@ -175,7 +175,7 @@ type usageEventsLiveStream struct {
 	keys       service.CPAAPIKeyProvider
 }
 
-// 每批非空事件使用当前活跃来源和 API Key 映射，避免长连接复用建流时的旧展示信息。
+// Refresh source and historical key attribution for each nonempty batch.
 func (s *usageEventsLiveStream) buildEvents(ctx context.Context, rows []servicedto.UsageEventRecord) ([]usageEventPayload, error) {
 	if len(rows) == 0 {
 		return []usageEventPayload{}, nil
@@ -190,7 +190,7 @@ func (s *usageEventsLiveStream) buildEvents(ctx context.Context, rows []serviced
 	}
 	var keyInfos map[string]analysisAPIKeyInfo
 	if s.keys != nil {
-		keys, err := s.keys.ListCPAAPIKeys(ctx)
+		keys, err := s.keys.ListCPAAPIKeysForHistory(ctx)
 		if err != nil {
 			return nil, fmt.Errorf("list api key options: %w", err)
 		}

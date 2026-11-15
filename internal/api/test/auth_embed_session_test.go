@@ -682,6 +682,10 @@ func findCookie(cookies []*http.Cookie, name string) *http.Cookie {
 
 type inactiveCPAAPIKeyProvider struct{}
 
+func (inactiveCPAAPIKeyProvider) ListCPAAPIKeysForHistory(ctx context.Context) ([]entities.CPAAPIKey, error) {
+	return inactiveCPAAPIKeyProvider{}.ListCPAAPIKeys(ctx)
+}
+
 func (inactiveCPAAPIKeyProvider) ListCPAAPIKeys(context.Context) ([]entities.CPAAPIKey, error) {
 	return nil, nil
 }

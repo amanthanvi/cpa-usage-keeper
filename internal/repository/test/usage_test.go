@@ -244,7 +244,7 @@ func TestBuildAnalysisWithFilterMarksCostUnavailableForUnpricedStats(t *testing.
 	}
 }
 
-func TestBuildAnalysisWithFilterExcludesMissingAndDeletedCPAAPIKeys(t *testing.T) {
+func TestBuildAnalysisWithFilterIncludesRetiredAndExcludesMissingCPAAPIKeys(t *testing.T) {
 	db := openTestDatabase(t)
 	bucket := time.Date(2026, 4, 20, 9, 0, 0, 0, time.UTC)
 	deletedAt := bucket.Add(time.Hour)
@@ -268,17 +268,17 @@ func TestBuildAnalysisWithFilterExcludesMissingAndDeletedCPAAPIKeys(t *testing.T
 	if err != nil {
 		t.Fatalf("BuildAnalysisWithFilter returned error: %v", err)
 	}
-	if len(analysis.APIKeyComposition) != 1 || analysis.APIKeyComposition[0].Key != "sk-active-key" || analysis.APIKeyComposition[0].TotalTokens != 30 {
-		t.Fatalf("expected only active CPA API key stats, got %+v", analysis.APIKeyComposition)
+	if len(analysis.APIKeyComposition) != 2 || analysis.APIKeyComposition[0].Key != "sk-deleted-key" || analysis.APIKeyComposition[0].TotalTokens != 70 || analysis.APIKeyComposition[1].Key != "sk-active-key" || analysis.APIKeyComposition[1].TotalTokens != 30 {
+		t.Fatalf("expected active and retired registered key stats, got %+v", analysis.APIKeyComposition)
 	}
-	if len(analysis.ModelComposition) != 1 || analysis.ModelComposition[0].Key != "claude-sonnet" {
-		t.Fatalf("expected models from active CPA API key only, got %+v", analysis.ModelComposition)
+	if len(analysis.ModelComposition) != 2 || analysis.ModelComposition[0].Key != "claude-opus" || analysis.ModelComposition[1].Key != "claude-sonnet" {
+		t.Fatalf("expected models from registered keys only, got %+v", analysis.ModelComposition)
 	}
-	if len(analysis.Heatmap) != 1 || analysis.Heatmap[0].APIKey != "sk-active-key" {
-		t.Fatalf("expected heatmap from active CPA API key only, got %+v", analysis.Heatmap)
+	if len(analysis.Heatmap) != 2 {
+		t.Fatalf("expected heatmap from active and retired keys, got %+v", analysis.Heatmap)
 	}
-	if len(analysis.TokenUsage) != 1 || analysis.TokenUsage[0].TotalTokens != 30 || analysis.TokenUsage[0].Requests != 2 {
-		t.Fatalf("expected token usage from active CPA API key only, got %+v", analysis.TokenUsage)
+	if len(analysis.TokenUsage) != 1 || analysis.TokenUsage[0].TotalTokens != 100 || analysis.TokenUsage[0].Requests != 5 {
+		t.Fatalf("expected token usage from registered keys, got %+v", analysis.TokenUsage)
 	}
 }
 
@@ -335,11 +335,11 @@ func TestBuildAnalysisWithFilterBuildsIdentityCompositionsFromActiveUsageIdentit
 	if len(analysis.AIProviderComposition) != 2 {
 		t.Fatalf("expected two ai provider composition rows, got %+v", analysis.AIProviderComposition)
 	}
-	if analysis.AIProviderComposition[0].Key != "shared-index" || analysis.AIProviderComposition[0].Label != "Shared Prefix" || analysis.AIProviderComposition[0].TotalTokens != 90 {
-		t.Fatalf("expected shared provider row first, got %+v", analysis.AIProviderComposition)
+	if analysis.AIProviderComposition[0].Key != "provider-1" || analysis.AIProviderComposition[0].Label != "Team Prefix @ api.openai.com" || analysis.AIProviderComposition[0].TotalTokens != 160 || analysis.AIProviderComposition[0].Requests != 10 {
+		t.Fatalf("expected active provider totals across active and retired client keys first, got %+v", analysis.AIProviderComposition)
 	}
-	if analysis.AIProviderComposition[1].Key != "provider-1" || analysis.AIProviderComposition[1].Label != "Team Prefix @ api.openai.com" || analysis.AIProviderComposition[1].TotalTokens != 60 {
-		t.Fatalf("expected active provider row second, got %+v", analysis.AIProviderComposition)
+	if analysis.AIProviderComposition[1].Key != "shared-index" || analysis.AIProviderComposition[1].Label != "Shared Prefix" || analysis.AIProviderComposition[1].TotalTokens != 90 {
+		t.Fatalf("expected shared provider row second, got %+v", analysis.AIProviderComposition)
 	}
 }
 

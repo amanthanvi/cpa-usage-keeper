@@ -100,6 +100,7 @@ func TestPricingModelsHTTPKeepsAdminBoundaryAndModelOptionsSource(t *testing.T) 
 		{http.MethodGet, "/api/v1/pricing/models", ""},
 		{http.MethodGet, "/api/v1/pricing/model-options", ""},
 		{http.MethodPut, "/api/v1/pricing/models", completePricingHTTPBody},
+		{http.MethodPost, "/api/v1/pricing/models/add-missing", `{"expected_revision":0,"models":[` + completePricingHTTPBody + `]}`},
 		{http.MethodDelete, "/api/v1/pricing/models?model=openai%2Fgpt-5.6", ""},
 	} {
 		anonymous := httptest.NewRecorder()

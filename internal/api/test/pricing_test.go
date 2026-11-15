@@ -68,6 +68,7 @@ func TestPricingRouterRegistersOnlyCompleteContract(t *testing.T) {
 	}
 	for _, route := range []string{
 		"GET /api/v1/pricing/models", "GET /api/v1/pricing/model-options", "PUT /api/v1/pricing/models", "DELETE /api/v1/pricing/models",
+		"POST /api/v1/pricing/models/add-missing",
 		"GET /api/v1/pricing/sync/fetch", "POST /api/v1/pricing/sync/apply",
 		"GET /api/v1/pricing/recalculations/options", "POST /api/v1/pricing/recalculations", "GET /api/v1/pricing/recalculations/current",
 	} {

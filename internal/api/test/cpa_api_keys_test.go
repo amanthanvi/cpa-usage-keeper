@@ -132,7 +132,7 @@ func TestCPAAPIKeyRoutesNormalizeStaleDisplayKeys(t *testing.T) {
 	}
 }
 
-func TestCPAAPIKeyOptionsReturnActiveLabels(t *testing.T) {
+func TestCPAAPIKeyOptionsReturnActiveAndRetiredLabels(t *testing.T) {
 	db := openAPITestDatabase(t)
 	if err := repository.SyncCPAAPIKeys(db, []string{"sk-alpha123456", "sk-beta654321"}, time.Date(2026, 5, 13, 10, 0, 0, 0, time.UTC)); err != nil {
 		t.Fatalf("seed API keys: %v", err)
@@ -158,9 +158,9 @@ func TestCPAAPIKeyOptionsReturnActiveLabels(t *testing.T) {
 	if err := json.Unmarshal(resp.Body.Bytes(), &parsed); err != nil {
 		t.Fatalf("decode response: %v", err)
 	}
-	want := []map[string]string{{"id": "1", "label": "Primary Key"}}
+	want := []map[string]string{{"id": "1", "label": "Primary Key"}, {"id": "2", "label": "sk-*********654321"}}
 	if !reflect.DeepEqual(parsed.Options, want) {
-		t.Fatalf("options must expose only active ids and labels, got %+v", parsed.Options)
+		t.Fatalf("options must expose historical ids and safe labels, got %+v", parsed.Options)
 	}
 }
 

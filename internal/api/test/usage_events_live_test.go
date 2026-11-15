@@ -224,12 +224,12 @@ type countingLiveCPAAPIKeyProvider struct {
 	failure error
 }
 
-func (p *countingLiveCPAAPIKeyProvider) ListCPAAPIKeys(ctx context.Context) ([]entities.CPAAPIKey, error) {
+func (p *countingLiveCPAAPIKeyProvider) ListCPAAPIKeysForHistory(ctx context.Context) ([]entities.CPAAPIKey, error) {
 	p.calls.Add(1)
 	if p.failure != nil {
 		return nil, p.failure
 	}
-	return p.CPAAPIKeyProvider.ListCPAAPIKeys(ctx)
+	return p.CPAAPIKeyProvider.ListCPAAPIKeysForHistory(ctx)
 }
 
 func TestUsageEventsLiveResolvesNewPluginAPIKeyLabels(t *testing.T) {
@@ -476,7 +476,7 @@ type blockingLiveCPAAPIKeyProvider struct {
 	canceled chan error
 }
 
-func (p *blockingLiveCPAAPIKeyProvider) ListCPAAPIKeys(ctx context.Context) ([]entities.CPAAPIKey, error) {
+func (p *blockingLiveCPAAPIKeyProvider) ListCPAAPIKeysForHistory(ctx context.Context) ([]entities.CPAAPIKey, error) {
 	close(p.started)
 	<-ctx.Done()
 	p.canceled <- ctx.Err()

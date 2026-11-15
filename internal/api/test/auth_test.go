@@ -23,6 +23,10 @@ type authLoginKeyStub struct {
 	byValueKey string
 }
 
+func (s *authLoginKeyStub) ListCPAAPIKeysForHistory(ctx context.Context) ([]entities.CPAAPIKey, error) {
+	return s.ListCPAAPIKeys(ctx)
+}
+
 func (s *authLoginKeyStub) ListCPAAPIKeys(context.Context) ([]entities.CPAAPIKey, error) {
 	if len(s.rowsByID) > 0 {
 		rows := make([]entities.CPAAPIKey, 0, len(s.rowsByID))

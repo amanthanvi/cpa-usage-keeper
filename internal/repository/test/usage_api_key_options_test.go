@@ -82,19 +82,19 @@ func TestUsageAPIKeyOptionsUsePageSpecificSources(t *testing.T) {
 			}
 		})
 	}
-	check("overview-long", "overview", base, cache, "left", "hour-left", "daily", "hour-recent", "right", "cached", "future")
-	check("overview-fallback", "overview", base, nil, "left", "hour-left", "daily", "hour-recent", "right")
+	check("overview-long", "overview", base, cache, "left", "hour-left", "daily", "hour-recent", "right", "cached", "future", "deleted")
+	check("overview-fallback", "overview", base, nil, "left", "hour-left", "daily", "hour-recent", "right", "deleted")
 	check("analysis-calendar-days", "analysis", base, cache, "daily", "day-left", "day-right")
-	check("events-ignore-other-filters", "request-events", base, cache, "left", "right", "raw-interior")
-	check("realtime-cache", "realtime", dto.UsageQueryFilter{RealtimeWindow: "15m", QueryNow: &now}, cache, "right", "cached")
-	check("realtime-fallback", "realtime", dto.UsageQueryFilter{RealtimeWindow: "15m", QueryNow: &now}, nil, "right")
+	check("events-ignore-other-filters", "request-events", base, cache, "left", "right", "raw-interior", "deleted")
+	check("realtime-cache", "realtime", dto.UsageQueryFilter{RealtimeWindow: "15m", QueryNow: &now}, cache, "right", "cached", "deleted")
+	check("realtime-fallback", "realtime", dto.UsageQueryFilter{RealtimeWindow: "15m", QueryNow: &now}, nil, "right", "deleted")
 	hs, he := now.Truncate(time.Hour).Add(-3*time.Hour), now.Truncate(time.Hour).Add(time.Hour)
 	custom := dto.UsageQueryFilter{Range: "custom", CustomUnit: "hour", StartTime: &hs, EndTime: &he, EndExclusive: true, QueryNow: &now}
 	check("overview-custom-hour", "overview", custom, cache, "hour-recent", "hour-current")
 	check("analysis-custom-hour", "analysis", custom, cache, "hour-recent", "hour-current")
 	rollingStart := now.Add(-8 * time.Hour)
 	rolling := dto.UsageQueryFilter{Range: "8h", StartTime: &rollingStart, EndTime: &now, EndExclusive: true, QueryNow: &now}
-	check("overview-short", "overview", rolling, cache, "hour-recent", "right", "cached", "future")
+	check("overview-short", "overview", rolling, cache, "hour-recent", "right", "cached", "future", "deleted")
 	check("analysis-incremental-hour", "analysis", rolling, nil, "hour-recent", "hour-current")
 	ds, de := time.Date(2026, 5, 13, 0, 0, 0, 0, time.Local), time.Date(2026, 5, 21, 0, 0, 0, 0, time.Local)
 	custom = dto.UsageQueryFilter{Range: "custom", CustomUnit: "day", StartTime: &ds, EndTime: &de, EndExclusive: true, QueryNow: &now}

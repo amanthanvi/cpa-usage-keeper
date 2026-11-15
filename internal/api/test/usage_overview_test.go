@@ -47,6 +47,10 @@ type overviewAPIKeyStub struct {
 	findErr error
 }
 
+func (s *overviewAPIKeyStub) ListCPAAPIKeysForHistory(ctx context.Context) ([]entities.CPAAPIKey, error) {
+	return s.ListCPAAPIKeys(ctx)
+}
+
 func (s *overviewAPIKeyStub) ListCPAAPIKeys(context.Context) ([]entities.CPAAPIKey, error) {
 	return []entities.CPAAPIKey{s.row}, nil
 }

@@ -169,6 +169,10 @@ type authCPAAPIKeyStub struct {
 	row entities.CPAAPIKey
 }
 
+func (s *authCPAAPIKeyStub) ListCPAAPIKeysForHistory(ctx context.Context) ([]entities.CPAAPIKey, error) {
+	return s.ListCPAAPIKeys(ctx)
+}
+
 func (s *authCPAAPIKeyStub) ListCPAAPIKeys(context.Context) ([]entities.CPAAPIKey, error) {
 	return []entities.CPAAPIKey{s.row}, nil
 }

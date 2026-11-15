@@ -16,7 +16,7 @@ func ListUsageAPIKeyOptions(db *gorm.DB, scope string, filter dto.UsageQueryFilt
 	if db == nil {
 		return nil, fmt.Errorf("database is nil")
 	}
-	keys, err := ListActiveCPAAPIKeys(db)
+	keys, err := ListCPAAPIKeysForHistory(db)
 	if err != nil {
 		return nil, err
 	}
@@ -32,7 +32,7 @@ func ListUsageAPIKeyOptions(db *gorm.DB, scope string, filter dto.UsageQueryFilt
 		query := overviewBucketRead(start, end, grain).query(db.Table(table)).
 			Select("1").Where("api_group_key = cpa_api_keys.api_key AND request_count > 0")
 		var matches []entities.CPAAPIKey
-		if err := db.Model(&entities.CPAAPIKey{}).Where("is_deleted = ? AND api_key <> ?", false, "").Where("EXISTS (?)", query).Find(&matches).Error; err != nil {
+		if err := db.Model(&entities.CPAAPIKey{}).Where("api_key <> ?", "").Where("EXISTS (?)", query).Find(&matches).Error; err != nil {
 			return err
 		}
 		for _, key := range matches {

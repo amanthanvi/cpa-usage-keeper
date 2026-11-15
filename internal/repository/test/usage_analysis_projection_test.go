@@ -103,7 +103,7 @@ func TestAnalysisProjectionPreservesHourlyResultsAndAPIKeyFiltering(t *testing.T
 	}
 
 	analysis, err := repository.BuildAnalysisWithFilter(db, repodto.UsageQueryFilter{
-		Range: "custom", StartTime: &bucket, EndTime: &end, EndExclusive: true,
+		Range: "custom", StartTime: &bucket, EndTime: &end, EndExclusive: true, APIGroupKey: "group-a",
 	})
 	if err != nil {
 		t.Fatalf("BuildAnalysisWithFilter: %v", err)
@@ -142,6 +142,16 @@ func TestAnalysisProjectionPreservesHourlyResultsAndAPIKeyFiltering(t *testing.T
 	if !analysis.CostSummary.CostAvailable {
 		t.Fatalf("expected available cost summary: %+v", analysis.CostSummary)
 	}
+	all, err := repository.BuildAnalysisWithFilter(db, repodto.UsageQueryFilter{
+		Range: "custom", StartTime: &bucket, EndTime: &end, EndExclusive: true,
+	})
+	if err != nil {
+		t.Fatal(err)
+	}
+	if len(all.APIKeyComposition) != 2 || len(all.Heatmap) != 2 || len(all.TokenUsage) != 1 || all.TokenUsage[0].Requests != 101 || all.TokenUsage[0].TotalTokens != 100_300_000 || all.CostSummary.CostAvailable {
+		t.Fatalf("unfiltered analysis must retain retired usage and unavailable cost: %+v", all)
+	}
+	assertFloatClose(t, all.CostSummary.TotalCostUSD, 9.3)
 
 	if err := db.Create(&entities.CPAAPIKey{APIKey: "group-b", DisplayKey: "sk-***b"}).Error; err != nil {
 		t.Fatalf("seed second active API key: %v", err)

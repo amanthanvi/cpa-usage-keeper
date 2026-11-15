@@ -309,7 +309,7 @@ func TestUsageServiceRejectsInvalidAPIKeyID(t *testing.T) {
 	}
 }
 
-func TestUsageServiceRejectsDeletedAPIKeyID(t *testing.T) {
+func TestUsageServiceResolvesRetiredAPIKeyIDWithoutGrantingAuthentication(t *testing.T) {
 	db := openUsageServiceTestDatabase(t)
 	key := entities.CPAAPIKey{APIKey: "sk-deleted-key", IsDeleted: true}
 	if err := db.Create(&key).Error; err != nil {
@@ -317,9 +317,16 @@ func TestUsageServiceRejectsDeletedAPIKeyID(t *testing.T) {
 	}
 	provider := service.NewUsageService(db, emptyPricingCatalogForTest())
 
-	_, err := provider.GetUsageOverview(context.Background(), servicedto.UsageFilter{APIKeyID: strconv.FormatInt(key.ID, 10)})
-	if !errors.Is(err, gorm.ErrRecordNotFound) {
-		t.Fatalf("expected deleted key to return record not found, got %v", err)
+	cost, available := 0.0, true
+	if err := db.Create(&entities.UsageEvent{EventKey: "retired-filter", APIGroupKey: key.APIKey, Timestamp: time.Now(), CostUSD: &cost, CostAvailable: &available}).Error; err != nil {
+		t.Fatal(err)
+	}
+	events, err := provider.ListUsageEvents(context.Background(), servicedto.UsageFilter{APIKeyID: strconv.FormatInt(key.ID, 10), Page: 1, PageSize: 100, Limit: 100})
+	if err != nil || events.TotalCount != 1 || len(events.Events) != 1 || events.Events[0].APIGroupKey != key.APIKey {
+		t.Fatalf("retired history filter: events=%+v err=%v", events, err)
+	}
+	if _, err := repository.FindActiveCPAAPIKeyByID(db, key.ID); !errors.Is(err, gorm.ErrRecordNotFound) {
+		t.Fatalf("retired history resolution granted authentication: %v", err)
 	}
 }
 

@@ -61,7 +61,7 @@ func (s *usageService) resolveAPIGroupKey(ctx context.Context, apiKeyID string) 
 	if err != nil || parsedID <= 0 {
 		return "", ErrInvalidID
 	}
-	apiKey, err := repository.FindActiveCPAAPIKeyByID(s.db.WithContext(ctx), parsedID)
+	apiKey, err := repository.FindCPAAPIKeyByIDForHistory(s.db.WithContext(ctx), parsedID)
 	if err != nil {
 		return "", err
 	}

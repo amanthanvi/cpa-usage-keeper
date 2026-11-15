@@ -20,6 +20,10 @@ type usageAnalysisAPIKeyStub struct {
 	rows []entities.CPAAPIKey
 }
 
+func (s usageAnalysisAPIKeyStub) ListCPAAPIKeysForHistory(ctx context.Context) ([]entities.CPAAPIKey, error) {
+	return s.ListCPAAPIKeys(ctx)
+}
+
 func (s usageAnalysisAPIKeyStub) ListCPAAPIKeys(context.Context) ([]entities.CPAAPIKey, error) {
 	return s.rows, nil
 }

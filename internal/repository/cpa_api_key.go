@@ -112,6 +112,18 @@ func ListActiveCPAAPIKeys(db *gorm.DB) ([]entities.CPAAPIKey, error) {
 	return rows, err
 }
 
+func ListCPAAPIKeysForHistory(db *gorm.DB) ([]entities.CPAAPIKey, error) {
+	var rows []entities.CPAAPIKey
+	err := db.Select("id, api_key, display_key, key_alias, source_type, access_provider").Order("id asc").Find(&rows).Error
+	return rows, err
+}
+
+func FindCPAAPIKeyByIDForHistory(db *gorm.DB, id int64) (entities.CPAAPIKey, error) {
+	var row entities.CPAAPIKey
+	err := db.Select("id, api_key, display_key, key_alias, source_type, access_provider").Where("id = ?", id).First(&row).Error
+	return row, err
+}
+
 func FindActiveCPAAPIKeyByID(db *gorm.DB, id int64) (entities.CPAAPIKey, error) {
 	var row entities.CPAAPIKey
 	err := db.Where("id = ? AND is_deleted = ?", id, false).First(&row).Error

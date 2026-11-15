@@ -9,6 +9,7 @@ import (
 
 	"cpa-usage-keeper/internal/entities"
 	"cpa-usage-keeper/internal/overview"
+	"cpa-usage-keeper/internal/repository/migration"
 	"cpa-usage-keeper/internal/repository/overviewstore"
 	"gorm.io/gorm"
 	"gorm.io/plugin/dbresolver"
@@ -120,6 +121,9 @@ func beginLegacyPricingOverview(ctx context.Context, writer *gorm.DB, baseline P
 		if state.Phase != pricingMigrationPhaseDataComplete || cursors.Overview == nil {
 			return PricingLegacyBaseline{}, PricingMigrationEventCursors{}, "", false, fmt.Errorf("completed pricing state has no overview cursor")
 		}
+		if err := migration.VerifyLegacyOverviewArchives(writer.Clauses(dbresolver.Write).WithContext(ctx)); err != nil {
+			return PricingLegacyBaseline{}, PricingMigrationEventCursors{}, "", false, err
+		}
 		return stored, cursors, *state.CursorsJSON, true, nil
 	}
 	if state.Phase == pricingMigrationPhaseOverviewRebuilding {
@@ -127,6 +131,9 @@ func beginLegacyPricingOverview(ctx context.Context, writer *gorm.DB, baseline P
 			return PricingLegacyBaseline{}, PricingMigrationEventCursors{}, "", false, fmt.Errorf("pricing overview phase has no cursor")
 		}
 		if err := validatePricingOverviewCursor(cursors.Overview, stored.Fixed); err != nil {
+			return PricingLegacyBaseline{}, PricingMigrationEventCursors{}, "", false, err
+		}
+		if err := migration.VerifyLegacyOverviewArchives(writer.Clauses(dbresolver.Write).WithContext(ctx)); err != nil {
 			return PricingLegacyBaseline{}, PricingMigrationEventCursors{}, "", false, err
 		}
 		return stored, cursors, *state.CursorsJSON, false, nil
@@ -140,6 +147,9 @@ func beginLegacyPricingOverview(ctx context.Context, writer *gorm.DB, baseline P
 		return PricingLegacyBaseline{}, PricingMigrationEventCursors{}, "", false, fmt.Errorf("encode pricing overview initial cursor: %w", err)
 	}
 	if err := writer.Clauses(dbresolver.Write).WithContext(ctx).Transaction(func(tx *gorm.DB) error {
+		if err := migration.PreserveLegacyOverviewArchives(tx); err != nil {
+			return err
+		}
 		result := tx.Model(&entities.PricingMigrationState{}).
 			Where("id = ? AND phase = ? AND data_complete = ? AND cursors_json = ?", 1, pricingMigrationPhaseEventsBackfilled, false, *state.CursorsJSON).
 			Updates(map[string]any{"phase": pricingMigrationPhaseOverviewRebuilding, "cursors_json": string(nextBytes)})

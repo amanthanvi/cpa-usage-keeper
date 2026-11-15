@@ -63,6 +63,10 @@ type keyViewerAnalysisKeyStub struct {
 	listCalls int
 }
 
+func (s *keyViewerAnalysisKeyStub) ListCPAAPIKeysForHistory(ctx context.Context) ([]entities.CPAAPIKey, error) {
+	return s.ListCPAAPIKeys(ctx)
+}
+
 func (s *keyViewerAnalysisKeyStub) ListCPAAPIKeys(context.Context) ([]entities.CPAAPIKey, error) {
 	s.listCalls++
 	return []entities.CPAAPIKey{s.row, {ID: 99, APIKey: "sk-other654321", KeyAlias: "Other Key"}}, nil
