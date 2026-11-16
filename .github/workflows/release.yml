@@ -19,6 +19,7 @@ jobs:
       full: true
 
   docker:
+    if: github.repository == 'Willxup/cpa-usage-keeper'
     needs: ci
     permissions:
       contents: read
@@ -26,6 +27,7 @@ jobs:
     uses: ./.github/workflows/docker-publish.yml
 
   binaries:
+    if: github.repository == 'Willxup/cpa-usage-keeper'
     needs: ci
     permissions:
       contents: write

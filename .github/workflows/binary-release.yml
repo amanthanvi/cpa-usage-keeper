@@ -240,6 +240,7 @@ jobs:
           if-no-files-found: error
 
   publish-release:
+    if: github.repository == 'Willxup/cpa-usage-keeper'
     runs-on: ubuntu-26.04
     needs:
       - release-policy
@@ -282,6 +283,7 @@ jobs:
             ${{ steps.version_file.outputs.path }}
 
   update-homebrew-tap:
+    if: github.repository == 'Willxup/cpa-usage-keeper'
     runs-on: ubuntu-26.04
     needs: [release-policy, publish-release]
     steps:
